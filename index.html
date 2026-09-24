@@ -239,6 +239,22 @@ dialog.palette::backdrop{background:rgba(10,10,20,.45)}
     <p class="lede">I work on interpretable AI: models whose reasoning can be read, tested and compared with how human minds work.</p>
     <p class="areas">Interpretability in machine learning. Cognitive science. Neuroscience. Theory of Mind.</p>
 
+    <div class="stage">
+      <div class="stage-top">
+        <button class="play" id="playBtn" type="button">
+          <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 1l11 6-11 6z" fill="currentColor"/></svg>
+          <span>Play a phrase</span>
+        </button>
+        <label class="switch"><input type="checkbox" id="soundToggle"> Sound while drawing</label>
+        <span class="hint" id="hint">Move across the lines to sing your own phrase.</span>
+      </div>
+      <div class="canvas-box" id="canvasBox">
+        <canvas id="contour" role="img" aria-label="Pitch contour of a phrase in rāga Māyāmāḷavagauḷa, drawn over eight swara lines from Sa to upper Sa. Move the pointer over it to draw your own."></canvas>
+      </div>
+      <div class="dwell" id="dwell" aria-hidden="true"></div>
+      <p class="caption">Rāga Māyāmāḷavagauḷa. The bars show how long the melody stays on each swara. Features like these, where a phrase dwells and how it moves between notes, are what my dissertation uses to tell rāgas apart.</p>
+    </div>
+
     <div class="hero-links">
       <a href="https://github.com/krsnkkv" target="_blank" rel="noopener">GitHub</a>
       <a href="https://www.linkedin.com/in/krishnasree-kelath/" target="_blank" rel="noopener">LinkedIn</a>
@@ -273,52 +289,7 @@ dialog.palette::backdrop{background:rgba(10,10,20,.45)}
       <h2>Research</h2>
       <p>I want models we can open up and question, and I use human cognition as the yardstick: if a model's reasoning can be laid out in terms people use, we can check it against how people actually think. My dissertation tested that idea on music, a domain I know from the inside.</p>
     </div>
-    <div class="diss-head">
-      <h3 class="diss-title">How do we hear a rāga?</h3>
-      <p class="research-meta">MEng dissertation, University of Birmingham, 2026. Supervised by Martín Escardó.</p>
-      <p class="docs" id="docs" hidden><a href="dissertation.pdf" id="dissLink">Read the dissertation (PDF)</a></p>
-    </div>
-    <p class="research-lede">A trained listener can name a rāga within a few phrases, long before they could list its scale. My dissertation asks what they are hearing, and builds a model whose every decision can be read back in musical terms.</p>
-    <div class="research">
-      <div>
-        <div class="prose">
-          <p>The pipeline turns a recording into a pitch contour, anchors it to the performer's tonic, maps it onto swaras, and describes each rāga by where the melody dwells and how it moves. That is its shape. A support vector machine classifies from those features, so every prediction comes with a reason a musician would recognise.</p>
-        </div>
-        <ul class="findings">
-          <li><b>67.8%</b><span>weighted F1 from 16 dwell and vādi features, on the SARAGA dataset with GroupKFold cross-validation</span></li>
-          <li><b>+31</b><span>percentage points over a BiLSTM baseline</span></li>
-          <li><b>5.19×</b><span>more confusion within rāga families than between them (p &lt; 0.0001)</span></li>
-          <li><b>4.4%</b><span>for MFCC timbre features, below chance: sound colour alone doesn't identify a rāga</span></li>
-        </ul>
-      </div>
-      <div class="pipeline">
-        <h3>The six stages</h3>
-        <ol class="steps" role="tablist" aria-label="Pipeline stages" id="steps"></ol>
-        <div class="step-panel" role="tabpanel" id="stepPanel" aria-live="polite">
-          <h4 id="stepTitle"></h4>
-          <p id="stepText"></p>
-        </div>
-        <ul class="stack">
-          <li>PyTorch</li><li>torchcrepe</li><li>librosa</li><li>scikit-learn</li><li>SARAGA</li>
-        </ul>
-      </div>
-    </div>
-    <div class="stage in-research">
-      <div class="stage-top">
-        <button class="play" id="playBtn" type="button">
-          <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 1l11 6-11 6z" fill="currentColor"/></svg>
-          <span>Play a phrase</span>
-        </button>
-        <label class="switch"><input type="checkbox" id="soundToggle"> Sound while drawing</label>
-        <span class="hint" id="hint">Move across the lines to sing your own phrase.</span>
-      </div>
-      <div class="canvas-box" id="canvasBox">
-        <canvas id="contour" role="img" aria-label="Pitch contour of a phrase in rāga Māyāmāḷavagauḷa, drawn over eight swara lines from Sa to upper Sa. Move the pointer over it to draw your own."></canvas>
-      </div>
-      <div class="dwell" id="dwell" aria-hidden="true"></div>
-      <p class="caption">Rāga Māyāmāḷavagauḷa. The bars show how long the melody stays on each swara. Features like these, where a phrase dwells and how it moves between notes, are what my dissertation uses to tell rāgas apart.</p>
-    </div>
-
+    <p class="docs" id="docs" hidden><a href="dissertation.pdf" id="dissLink">Read my MEng dissertation (PDF)</a></p>
   </div>
 </section>
 
@@ -326,7 +297,7 @@ dialog.palette::backdrop{background:rgba(10,10,20,.45)}
   <div class="wrap">
     <div class="sec-head">
       <h2>Projects</h2>
-      <p>Apps, talks, a satellite and some games. Open one for the details.</p>
+      <p>Research, apps, talks, a satellite and some games. Open one for the details.</p>
     </div>
     <div class="filters" id="filters" role="group" aria-label="Filter projects"></div>
     <div id="projList"></div>
@@ -716,39 +687,10 @@ if (location.protocol.startsWith("http")) {
 
 if (matchMedia("(pointer: coarse)").matches) $("#hint").textContent = "Drag across the lines to sing your own phrase.";
 
-/* ---------- pipeline stepper ---------- */
-const STEPS = [
-  ["Pitch extraction", "torchcrepe tracks the fundamental frequency of the voice or instrument through the recording, giving a continuous pitch contour rather than a list of notes, so the gamakas (ornaments) survive."],
-  ["Tonic normalisation", "Every performer chooses their own Sa. Each contour is re-expressed in cents relative to the performer's tonic, so recordings in different keys become directly comparable."],
-  ["Swara mapping", "The normalised contour is mapped onto the twelve swara positions of the octave, keeping track of the glides between them instead of snapping everything to a grid."],
-  ["Feature extraction", "Each recording becomes a short, readable description: how long the melody dwells on each swara, which swara dominates (the vādi), and how it moves between notes."],
-  ["Classification", "An SVM with an RBF kernel learns the rāgas from those 16 features. Because the inputs are musical quantities, its decisions can be traced back to them."],
-  ["Evaluation", "GroupKFold cross-validation on the SARAGA dataset keeps each recording's excerpts together, so the model is always tested on performances it has never heard."]
-];
-const stepsEl = $("#steps");
-STEPS.forEach(([title], i) => {
-  const li = document.createElement("li");
-  li.innerHTML = `<button role="tab" id="step-${i}" aria-controls="stepPanel" aria-label="Stage ${i + 1}: ${title}">${i + 1}</button>`;
-  stepsEl.appendChild(li);
-});
-const stepBtns = [...stepsEl.querySelectorAll("button")];
-function showStep(i) {
-  stepBtns.forEach((b, k) => { b.setAttribute("aria-selected", k === i); b.tabIndex = k === i ? 0 : -1; });
-  $("#stepTitle").textContent = STEPS[i][0];
-  $("#stepText").textContent = STEPS[i][1];
-  $("#stepPanel").setAttribute("aria-labelledby", `step-${i}`);
-}
-stepBtns.forEach((b, i) => {
-  b.addEventListener("click", () => showStep(i));
-  b.addEventListener("keydown", e => {
-    const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
-    if (d) { e.preventDefault(); const j = (i + d + STEPS.length) % STEPS.length; showStep(j); stepBtns[j].focus(); }
-  });
-});
-showStep(0);
-
 /* ---------- projects ---------- */
 const PROJECTS = [
+  { t: "How do we hear a rāga?", tag: "Research", role: "MEng dissertation, University of Birmingham", yr: "2025–26",
+    body: "An interpretable model of how listeners recognise Carnatic rāgas. The pipeline extracts a pitch contour with torchcrepe, normalises it to the performer's tonic, maps it onto swaras, and describes each rāga by where the melody dwells and how it moves, then classifies with an RBF-kernel SVM. On the SARAGA dataset with GroupKFold cross-validation it reached 67.8% weighted F1 from 16 dwell and vādi features, 31 points ahead of a BiLSTM baseline. Its mistakes clustered within rāga families (5.19× more confusion than between families, p &lt; 0.0001), while MFCC timbre features fell below chance at 4.4%.<br><br>Stack: PyTorch, torchcrepe, librosa, scikit-learn. Supervised by Martín Escardó." },
   { t: "Rahla", tag: "Apps", role: "Co-founder", yr: "2024–25",
     body: "An AI-powered AR travel app that lets tourists explore Dubai through games and challenges. We pitched it at the App Olympics 2024/25, run by Dubai Chambers, and reached the semi-finals.",
     imgs: [["rahla-cert.jpeg", "App Olympics semi-finalist certificate"], ["rahla-ceremony.jpeg", "App Olympics award ceremony"]] },
@@ -888,12 +830,11 @@ const go = id => () => document.getElementById(id).scrollIntoView({ behavior: re
 const ACTIONS = [
   ["About", "Section", go("about")],
   ["Research", "Section", go("research")],
-  ["Dissertation: How do we hear a rāga?", "Section", go("research")],
   ["Projects", "Section", go("projects")],
   ["Experience", "Section", go("experience")],
   ["Awards and certifications", "Section", go("recognition")],
   ["Contact", "Section", go("contact")],
-  ["Play a rāga phrase", "Action", () => { go("research")(); playPhrase(); }],
+  ["Play a rāga phrase", "Action", () => { go("top")(); playPhrase(); }],
   ["Switch colour theme", "Action", toggleTheme],
   ["Copy email address", "Action", () => { go("contact")(); copyEmail(); }],
   ["Open GitHub", "Link", () => window.open("https://github.com/krsnkkv", "_blank", "noopener")],
